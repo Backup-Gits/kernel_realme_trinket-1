@@ -2866,7 +2866,6 @@ extern int sched_boost(void);
 static inline int sched_boost(void)
 {
 	return sched_boost_type;
-	return unlikely(is_battery_saver_on()) ? 0 : sched_boost_type;
 }
 #endif /* CONFIG_PRODUCT_REALME_TRINKET */
 extern int preferred_cluster(struct sched_cluster *cluster,
