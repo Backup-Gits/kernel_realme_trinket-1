@@ -4792,15 +4792,6 @@ static void binder_free_proc(struct binder_proc *proc)
 	BUG_ON(!list_empty(&proc->todo));
 	BUG_ON(!list_empty(&proc->delivered_death));
 	WARN_ON(proc->outstanding_txns);
-	device = container_of(proc->context, struct binder_device, context);
-	if (refcount_dec_and_test(&device->ref)) {
-		kfree(proc->context->name);
-		kfree(device);
-	}
-	binder_alloc_deferred_release(&proc->alloc);
-	put_task_struct(proc->tsk);
-	binder_stats_deleted(BINDER_STAT_PROC);
-	kmem_cache_free(binder_proc_pool, proc);
 }
 
 static void binder_free_thread(struct binder_thread *thread)
@@ -5326,7 +5317,6 @@ static long binder_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 				continue;
 
 			binder_inner_proc_lock(target_proc);
-			atomic_inc(&target_proc->tmp_ref);
 			binder_inner_proc_unlock(target_proc);
 
 			target_procs[i++] = target_proc;
